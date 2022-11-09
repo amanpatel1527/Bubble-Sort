@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bubbble Sort </title>
+</head>
+<style>
+    body{
+        font-size: 1.5rem;
+    }
+    .container{
+        margin-top: 100px;
+        margin-right: auto;
+        margin-left: auto;
+        width: 80%;
+        min-width: 360px;
+    }
+    .array-input-lable{
+        display: block;
+        margin-bottom: 10px;
+    }
+    .array-input{
+        display: block;
+        height: 50px;
+        box-sizing: border-box;
+        outline: none;
+        width: 600px;
+        max-width: 100%;
+        padding-left: 10px;
+        border-radius: 5px;
+        border: 1px solid black;
+        font: inherit;
+        margin-bottom: 10px;
+    }
+    .submit-array{
+        height: 40px;
+        border-radius: 5px;
+        border: none;
+        color: white;
+        background-color: #09a0aa;
+        font: inherit;
+        width: 600px;
+        max-width: 100%;
+    }
+    .submit-array:hover{
+        background-color: #06585e;
+        transform: scale(1.02);
+    }
+    .array-input:focus{
+        border: 1px solid #09a0aa;
+        box-shadow: 0 0 5px #09a0aa;
+    }
+    .input-error{
+        color: red;
+    }
+    .array{
+        display: flex;
+        flex-wrap: wrap;
+        margin-bottom: 10px;
+    }
+    .array-element{
+        box-sizing: border-box;
+        height: 50px;
+        padding: 10px;
+        border: 1px solid black;
+        border-radius: 5px;
+        margin-right: 10px;
+        margin-bottom: 10px;
+    }
+    .array-element.swapped{
+        border-color: red;
+        box-shadow: 0 0 5px red;
+    }
+    .array-element.compared{
+        border-color: blue;
+        box-shadow: 0 0 5px blue;
+    }
+    .comparing{
+        color: blue;
+    }
+    .swapping{
+        color: red;
+    }
+</style>
+<body>
+    <div class="container">
+        <h2>Bubble Sort Simulator</h2>
+        <h3>Array Input By User</h3>
+        <input class="array-input" id="array-input" placeholder="Enter numbers, seperated by spaces...">
+        <button class="submit-array" id="submit-array">Sort The Array</button>
+        <div class="input-error" id="input-error"></div>
+        <h3>Sorted Array</h3>
+        <div class="array" id="array"></div>
+        <div class="status" id="status"></div>
+    </div>
+    <script>
+        const sleep = async (ms) => {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        const parseArrayInput = (inputStr) => {
+            const tokens = inputStr.trim().split(/\s+/);
+            const array = tokens.map(elem => parseFloat(elem));
+            if(array.length !== tokens.length || array.some(elem => isNaN(elem)))
+                return null;
+            return array;
+        }
+        const insertArrayToHtml = (array) => {
+            const html = '<div class="array-element">' + 
+                array.join('</div><div class="array-element">') + 
+                    '</div>';
+            document.getElementById('array').innerHTML = html;
+        }
+        const highlightElements = (i, j, additionalClass) => {
+            const array = document.getElementById('array').children;
+            array[i].classList.add(additionalClass);
+            array[j].classList.add(additionalClass);
+        }
+        const setStatus = (status) => {
+            const statusElem = document.getElementById('status');
+            statusElem.innerHTML = status === 'comparing' ? 'Comparing...' : 'Swapping...';
+            statusElem.className = status;
+        }
+        const bubbleSort = async () => {
+            const array = parseArrayInput(document.getElementById('array-input').value);
+            if(!array){
+                document.getElementById('input-error').innerHTML = 'Incorrect input!';
+                return;
+            }
+            document.getElementById('input-error').innerHTML = '';
+            const n = array.length;
+            for(let i = n - 1;i > 0;i--)
+                for(let j = 0;j < i;j++){
+                    insertArrayToHtml(array);
+                    highlightElements(j, j + 1, 'compared');
+                    setStatus('comparing');
+                    await sleep(1000);
+                    if(array[j] > array[j + 1])
+                    {
+                        [array[j], array[j + 1]] = [array[j + 1], array[j]];
+                        insertArrayToHtml(array);
+                        highlightElements(j, j + 1, 'swapped');
+                        setStatus('swapping');
+                        await sleep(1000);
+                    }
+                    
+                }
+            insertArrayToHtml(array);
+            document.getElementById('status').innerHTML = '';
+        }
+        document.getElementById('submit-array').addEventListener('click', bubbleSort);
+    </script>
+</body>
+</html>
